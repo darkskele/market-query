@@ -1,30 +1,40 @@
 """
-main.py — Entry point for running the NANDA MVP flow.
-
-This script takes a startup idea (via CLI arg or input prompt),
-runs it through a series of agents defined in `flows/mvp.yaml`,
-and prints out the final similarity scoring results in JSON format.
-
-Usage:
-    python main.py "An AI tool for pricing freelance services"
+main.py — Entry point for running the NANDA MVP flow with AI summarization.
 """
 
 from mcp_runner import run_flow
+from agents.summarizer import summarize_market_analysis
 import sys
 import json
 
 def main():
     # Get startup idea from command-line arguments or interactive input
     if len(sys.argv) > 1:
-        idea = " ".join(sys.argv[1:])  # Handle multi-word ideas
+        idea = " ".join(sys.argv[1:])
     else:
         idea = input("💡 Enter your startup idea: ").strip()
 
-    # Run the full agent chain using the YAML-defined flow
-    result = run_flow("flows/mvp.yaml", {"idea_text": idea}) 
-
-    # Print only the final similarity scoring output as formatted JSON
-    print(json.dumps(result, indent=2))
+    print(f"\n🔍 Analyzing: '{idea}'")
+    print("=" * 60)
+    
+    # Run the full agent chain
+    result = run_flow("flows/mvp.yaml", {"idea_text": idea})
+    
+    # Get the final scoring results 
+    final_results = result.get("score", {}).get("output", {})
+    
+    # Generate AI summary
+    print("\n🤖 AI Executive Summary:")
+    print("-" * 40)
+    summary = summarize_market_analysis(final_results)
+    print(summary)
+    
+    # Option to see full JSON
+    show_details = input("\n📋 Show detailed JSON results? (y/n): ").lower().startswith('y')
+    if show_details:
+        print("\n📊 Detailed Analysis:")
+        print("=" * 60)
+        print(json.dumps(final_results, indent=2))
 
 if __name__ == "__main__":
     main()

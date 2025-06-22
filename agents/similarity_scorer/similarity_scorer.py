@@ -2,10 +2,18 @@ import os
 import json
 from dotenv import load_dotenv
 from openai import OpenAI
+from mcp.server.fastmcp import FastMCP
 
 load_dotenv()
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
+mcp = FastMCP(
+    name="startup-similarity-scorer",
+    description="Scores startup ideas in terms of similarity to user idea.",
+    version="1.0.0",
+)
+
+@mcp.tool()
 def score_similarity(parsed_idea: dict, market_results: list, model="gpt-4") -> dict:
     scored_results = []
 
@@ -66,19 +74,7 @@ Return a JSON object. No markdown.
         "saturation": saturation_label
     }
 
+# Entry point
 if __name__ == "__main__":
-    from agents.market_search.market_search import run_market_search
-
-    parsed_idea = {
-        "description": "An AI tool that helps freelancers price services using competitor data",
-        "tags": ["AI", "freelancer", "pricing", "market analysis"],
-        "core_features": ["real-time scraping", "competitor analysis", "dynamic pricing"],
-        "target_user": "freelancers",
-        "use_case": "optimize service pricing based on demand"
-    }
-
-    market_results = run_market_search(parsed_idea, max_results=3)
-    result = score_similarity(parsed_idea, market_results)
-    
-    print("\n🔎 Similarity Scoring Result:")
-    print(json.dumps(result, indent=2))
+    import uvicorn
+    uvicorn.run(mcp.sse_app(), host="0.0.0.0", port=8002)

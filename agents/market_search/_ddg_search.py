@@ -14,7 +14,7 @@ def search_ddg(query: str, max_results=5) -> list:
                         "source": "ddg",
                         "title": r.get("title"),
                         "url": r.get("href"),
-                        "snippet": r.get("body"),
+                        "snippet": (r.get("body")[:200] + '...') if r.get("body") and len(r.get("body")) > 200 else r.get("body"),
                         "metadata": {}
                     })
             break  # success, exit retry loop

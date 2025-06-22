@@ -17,11 +17,20 @@ import json
 import os
 from dotenv import load_dotenv
 from openai import OpenAI
+from mcp.server.fastmcp import FastMCP
 
-# Load environment variables from .env (specifically for OPENAI_API_KEY)
+# Load environment variables
 load_dotenv()
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
+# Create MCP server instance
+mcp = FastMCP(
+    name="idea-parser",
+    description="Extracts structured fields from freeform startup ideas using GPT",
+    version="1.0.0",
+)
+
+@mcp.tool()
 def parse_idea(idea: str) -> dict:
     """
     Uses GPT to parse a startup idea string into a structured dictionary.
@@ -65,6 +74,7 @@ Only output a valid JSON object. No explanation, no markdown.
         print("Error:", e)
         return {}
 
+# Entry point
 if __name__ == "__main__":
-    idea = "A platform that helps creators monetize AI-generated short-form video using local models on mobile."
-    print(parse_idea(idea))
+    import uvicorn
+    uvicorn.run(mcp.sse_app(), host="0.0.0.0", port=8080)

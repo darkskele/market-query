@@ -28,7 +28,7 @@ def search_github(query: str, max_results=5) -> list:
             "source": "github",
             "title": repo.get("name"),
             "url": repo.get("html_url"),
-            "snippet": repo.get("description") or "",
+            "snippet": (repo.get("description")[:200] + '...') if repo.get("description") and len(repo.get("description")) > 200 else (repo.get("description") or ""),
             "metadata": {
                 "stars": repo.get("stargazers_count"),
                 "language": repo.get("language"),

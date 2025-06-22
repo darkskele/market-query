@@ -13,10 +13,15 @@ from typing import Dict, Any, List
 from datetime import datetime
 import statistics
 from collections import Counter
+from mcp.server.fastmcp import FastMCP
 
-app = FastMCP("Enhanced Research Gap Detection Server")
+mcp = FastMCP(
+    name="gap-analysis",
+    description="Identifies how well several projects fit in the market.",
+    version="1.0.0",
+)
 
-# @app.tool()
+@mcp.tool()
 def analyze_market_gaps(scored_results, uniqueness_score, saturation) -> Dict[str, Any]:
     """
     Analyze market gaps from scored results across multiple sources
@@ -24,22 +29,6 @@ def analyze_market_gaps(scored_results, uniqueness_score, saturation) -> Dict[st
     Args:
         market_data: JSON string containing scored_results, uniqueness_score, and saturation
         
-    Expected input format:
-    {
-        "scored_results": [
-            {
-                "source": "ddg" | "github" | "academic",
-                "title": "Product/repo title",
-                "url": "Link to product/repo", 
-                "snippet": "Description",
-                "metadata": {"stars": 100, "language": "Python", ...},
-                "similarity": 0.75,
-                "comment": "LLM analysis of overlaps and gaps"
-            }
-        ],
-        "uniqueness_score": 0.8,
-        "saturation": "Low market saturation"
-    }
     """
     try:
         
@@ -449,26 +438,7 @@ def _generate_strategic_recommendations(analysis: Dict[str, Any]) -> List[Dict[s
     
     return recommendations
 
-@app.tool()
-def get_server_info() -> Dict[str, Any]:
-    return {
-        "server_name": "Enhanced Research Gap Detection Server",
-        "version": "2.0.0",
-        "capabilities": ["analyze_market_gaps"],
-        "specialization": "Advanced market gap analysis with competitor intelligence and strategic recommendations",
-        "status": "active",
-        "input_format": "scored_results with similarity analysis and market data"
-    }
-
+# Entry point
 if __name__ == "__main__":
-    print("🔍 Starting Enhanced Gap Detection MCP Server...")
-    print("📡 SSE endpoint at http://localhost:8002/sse")
-    print("💡 Enhanced capabilities:")
-    print("   • Comprehensive market gap analysis")
-    print("   • Competitive landscape assessment")
-    print("   • Strategic opportunity scoring")
-    print("   • Actionable business recommendations")
-    print("   • Multi-source data integration")
-    
-    sse_app = create_sse_app(app, message_path="/", sse_path="/sse")
-    uvicorn.run(sse_app, host="0.0.0.0", port=8002, log_level="info")
+    import uvicorn
+    uvicorn.run(mcp.sse_app(), host="0.0.0.0", port=8004)
