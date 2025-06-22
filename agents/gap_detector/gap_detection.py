@@ -16,8 +16,8 @@ from collections import Counter
 
 app = FastMCP("Enhanced Research Gap Detection Server")
 
-@app.tool()
-def analyze_market_gaps(market_data: str) -> Dict[str, Any]:
+# @app.tool()
+def analyze_market_gaps(scored_results, uniqueness_score, saturation) -> Dict[str, Any]:
     """
     Analyze market gaps from scored results across multiple sources
     
@@ -42,10 +42,6 @@ def analyze_market_gaps(market_data: str) -> Dict[str, Any]:
     }
     """
     try:
-        data = json.loads(market_data)
-        scored_results = data.get("scored_results", [])
-        uniqueness_score = data.get("uniqueness_score", 0.0)
-        saturation = data.get("saturation", "Unknown")
         
         # Perform comprehensive gap analysis
         analysis = _perform_comprehensive_gap_analysis(scored_results, uniqueness_score, saturation)

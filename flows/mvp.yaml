@@ -28,12 +28,9 @@ steps:
   - id: gap
     uses: agents.gap_detector.gap_detection.analyze_market_gaps
     args:
-      market_data: |
-        {
-          "scored_results": steps.score.output.scored_results,
-          "uniqueness_score": steps.score.output.uniqueness_score,
-          "saturation": steps.score.output.saturation
-        }
+      scored_results: ${{ steps.score.output.scored_results }}
+      uniqueness_score: ${{ steps.score.output.uniqueness_score }}
+      saturation: ${{ steps.score.output.saturation }}
 
 
 

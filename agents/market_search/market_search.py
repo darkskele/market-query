@@ -7,7 +7,7 @@ def run_market_search(parsed_idea: dict, max_results=5) -> list:
 
     all_results = []
     for query in queries:
-        all_results.extend(search_ddg(query, max_results=max_results))
+        # all_results.extend(search_ddg(query, max_results=max_results))
         all_results.extend(search_github(query, max_results=max_results))
     
     return all_results

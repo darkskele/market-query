@@ -24,7 +24,7 @@ def main():
     result = run_flow("flows/mvp.yaml", {"idea_text": idea}) 
 
     # Print only the final similarity scoring output as formatted JSON
-    print(json.dumps(result["score"]["output"], indent=2))
+    print(json.dumps(result, indent=2))
 
 if __name__ == "__main__":
     main()
