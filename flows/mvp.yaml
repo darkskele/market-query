@@ -1,0 +1,39 @@
+description: Run full MVP chain from idea to scored market insight
+inputs:
+  - idea_text
+
+steps:
+  - id: parse
+    uses: agents.idea_parser.idea_parser.parse_idea
+    args:
+      idea: ${{ inputs.idea_text }}
+
+  # - id: arxiv
+  #   uses: agents.research_agent.research_agent.search_arxiv_papers
+  #   args:
+  #     query: ${{ steps.parse.output.description }}
+  #     category: "cs.AI"
+
+  - id: market
+    uses: agents.market_search.market_search.run_market_search
+    args:
+      parsed_idea: ${{ steps.parse.output }}
+
+  - id: score
+    uses: agents.similarity_scorer.similarity_scorer.score_similarity
+    args:
+      parsed_idea: ${{ steps.parse.output }}
+      market_results: ${{ steps.market.output }}
+
+  - id: gap
+    uses: agents.gap_detector.gap_detection.analyze_market_gaps
+    args:
+      market_data: |
+        {
+          "scored_results": steps.score.output.scored_results,
+          "uniqueness_score": steps.score.output.uniqueness_score,
+          "saturation": steps.score.output.saturation
+        }
+
+
+
